@@ -15,7 +15,7 @@ def empty_fn():
 # print("Antipattern: " + str(time.time() - s))
 
 # better approach
-ns = [100, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]
+ns = [10000, 12000, 14000, 16000, 18000, 20000]
 for n in ns:
     s = time.time()
     refs = []
