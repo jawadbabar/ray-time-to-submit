@@ -2,7 +2,7 @@ import ray
 import time
 import logging
 
-ray.init(log_to_driver=False, logging_level=logging.FATAL)
+ray.init(log_to_driver=False, logging_level=logging.FATAL) # removing warnings
 
 # empty task
 @ray.remote
@@ -28,22 +28,25 @@ print("Empty tasks (" + str(n) + "): "+ str(end - start))
 
 
 # empty actors
-start = time.time()
+for b in (range 50, 1000, 50):
 
-fns = [empty_fn for _ in range(n)]
-refs = []
-BATCH_SIZE = 500
-for i in range(0, len(fns), BATCH_SIZE):
-    batch = fns[i : i + BATCH_SIZE]
-    actor = EmptyActor.remote()
-    refs.append(actor.work.remote(batch))
+    start = time.time()
 
-# ray.get(refs)
+    BATCH_SIZE = b
+    fns = [empty_fn for _ in range(n)]
+    refs = []
 
-unfinished = refs
-while unfinished:
-    finished, unfinished = ray.wait(unfinished, num_returns=1)
-    ray.get(finished)
+    for i in range(0, len(fns), BATCH_SIZE):
+        batch = fns[i : i + BATCH_SIZE]
+        actor = EmptyActor.remote()
+        refs.append(actor.work.remote(batch))
 
-end = time.time()
-print("Actors with empty tasks (" + str(n) + "): "+ str(end - start))
+    # ray.get(refs)
+
+    unfinished = refs
+    while unfinished:
+        finished, unfinished = ray.wait(unfinished, num_returns=1)
+        ray.get(finished)
+
+    end = time.time()
+    print("Actors with empty tasks (" + str(n) + "): "+ str(end - start))
