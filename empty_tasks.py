@@ -37,10 +37,12 @@ for i in range(0, len(fns), BATCH_SIZE):
     actor = EmptyActor.remote()
     refs.append(actor.work.remote(batch))
 
-unfinished = refs
-while unfinished:
-    finished, unfinished = ray.wait(unfinished, num_returns=1)
-    ray.get(finished)
+ray.get(refs)
+
+# unfinished = refs
+# while unfinished:
+#     finished, unfinished = ray.wait(unfinished, num_returns=1)
+#     ray.get(finished)
 
 end = time.time()
 print("Actors with empty tasks (" + str(n) + "): "+ str(end - start))
