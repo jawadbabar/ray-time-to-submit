@@ -2,7 +2,8 @@ import ray
 import time
 import logging
 
-ray.init(log_to_driver=False, logging_level=logging.FATAL) # removing warnings
+# ray.init(log_to_driver=False, logging_level=logging.FATAL) # removing warnings
+ray.init()
 
 # empty task
 @ray.remote
