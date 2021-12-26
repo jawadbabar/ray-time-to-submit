@@ -11,43 +11,36 @@ def empty_fn():
 # empty actor
 @ray.remote
 class EmptyActor:
-    def __init__(self, fns):
-        self.returns = [fn.remote() for fn in fns]
-    def result(self):
-        return returns
-
-# antipattern
-# s = time.time()
-# returns = []
-# for i in range(100):
-#     returns.append(ray.get(empty_fn.remote()))
-# print("Antipattern: " + str(time.time() - s))
+    def work(self, fns):
+        self.refs = [fn.remote() for fn in fns]
+        return
 
 # total number of empty tasks that take a little more than 1s
 n = 18000
 # n = 2000
 
 # empty tasks
-s = time.time()
-refs = []
-for i in range(n):
-    refs.append(empty_fn.remote())
-returns = ray.get(refs)
-print("Empty tasks (" + str(n) + "): "+ str(time.time() - s))
+start = time.time()
+ray.get([empty_fn.remote() for _ in range(n)])
+end = time.time()
+print("Empty tasks (" + str(n) + "): "+ str(end - start))
 
 
 # empty actors
-s = time.time()
+start = time.time()
 
 fns = [empty_fn for _ in range(n)]
-# results = []
-BATCH_SIZE = 500
+refs = []
+BATCH_SIZE = 100
 for i in range(0, len(fns), BATCH_SIZE):
     batch = fns[i : i + BATCH_SIZE]
-    actor = EmptyActor.remote(batch)
-    ray.get(actor.result.remote())
+    actor = EmptyActor.remote()
+    refs.append(actor.work.remote(batch))
 
-# ray.get(returns)
+unfinished = refs
+while unfinished:
+    finished, unfinished = ray.wait(unfinished, num_returns=1)
+    ray.get(finished)
 
-
-print("Actors with empty tasks (" + str(n) + "): "+ str(time.time() - s))
+end = time.time()
+print("Actors with empty tasks (" + str(n) + "): "+ str(end - start))
