@@ -24,11 +24,11 @@ n = 18000
 start = time.time()
 ray.get([empty_fn.remote() for _ in range(n)])
 end = time.time()
-print("Empty tasks (" + str(n) + "): "+ str(end - start))
+print("Empty tasks (# tasks: " + str(n) + "): "+ str(end - start))
 
 
 # empty actors
-for b in range(50, 1000, 50):
+for b in range(50, 2000, 50):
 
     start = time.time()
 
@@ -49,4 +49,4 @@ for b in range(50, 1000, 50):
         ray.get(finished)
 
     end = time.time()
-    print("Actors with empty tasks (" + str(n) + "): "+ str(end - start))
+    print("Actors with empty tasks (# tasks: " + str(n) + ", batch size: ", b, "): "+ str(end - start))
