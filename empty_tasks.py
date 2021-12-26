@@ -49,4 +49,4 @@ for b in range(50, 2000, 50):
         ray.get(finished)
 
     end = time.time()
-    print("Actors with empty tasks (# tasks: " + str(n) + ", batch size: " + b + "): " + str(end - start))
+    print("Actors with empty tasks (# tasks: " + str(n) + ", batch size: " + str(b) + "): " + str(end - start))
