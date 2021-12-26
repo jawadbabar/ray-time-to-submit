@@ -28,7 +28,7 @@ print("Empty tasks (" + str(n) + "): "+ str(end - start))
 
 
 # empty actors
-for b in (range 50, 1000, 50):
+for b in range(50, 1000, 50):
 
     start = time.time()
 
