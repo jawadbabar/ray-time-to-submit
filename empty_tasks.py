@@ -1,5 +1,6 @@
 import ray
 import time
+import logging
 
 ray.init(log_to_driver=False, logging_level=logging.FATAL)
 
