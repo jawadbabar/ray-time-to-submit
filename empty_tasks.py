@@ -1,7 +1,7 @@
 import ray
 import time
 
-ray.init(log_to_driver=False)
+ray.init(log_to_driver=False, logging_level=logging.FATAL)
 
 # empty task
 @ray.remote
