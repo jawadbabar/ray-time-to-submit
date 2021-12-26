@@ -31,7 +31,7 @@ start = time.time()
 
 fns = [empty_fn for _ in range(n)]
 refs = []
-BATCH_SIZE = 100
+BATCH_SIZE = 500
 for i in range(0, len(fns), BATCH_SIZE):
     batch = fns[i : i + BATCH_SIZE]
     actor = EmptyActor.remote()
