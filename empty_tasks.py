@@ -18,7 +18,6 @@ class EmptyActor:
 
 # total number of empty tasks that take a little more than 1s
 n = 18000
-# n = 2000
 
 # empty tasks
 start = time.time()
@@ -28,7 +27,7 @@ print("Empty tasks (# tasks: " + str(n) + "): "+ str(end - start))
 
 
 # empty actors
-for b in range(4000, 4001):
+for b in range(4000, 5000, 100):
 
     start = time.time()
 
@@ -40,8 +39,6 @@ for b in range(4000, 4001):
         batch = fns[i : i + BATCH_SIZE]
         actor = EmptyActor.remote()
         refs.append(actor.work.remote(batch))
-
-    # ray.get(refs)
 
     unfinished = refs
     while unfinished:
