@@ -27,7 +27,7 @@ print("Empty tasks (# tasks: " + str(n) + "): "+ str(end - start))
 
 # empty actors
 fns = [empty_fn for _ in range(n)]
-for a in [1, 2, 4, 8, 16]:
+for a in [1, 2, 4, 8, 16, 32, 64, 128]:
 
     batch_size = n // a
 
