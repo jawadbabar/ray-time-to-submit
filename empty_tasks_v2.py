@@ -45,19 +45,21 @@ def empty_actor_experiment(fns, total_actors):
 
     return end - start
 
-print("Total number of empty tasks: " + str(TOTAL_EMPTY_TASKS))
-print("Remote function test:")
+if __name__ == "__main__":
+    print("Total number of empty tasks: " + str(TOTAL_EMPTY_TASKS))
+    print("Remote function test:")
 
-# empty tasks
-empty_tasks_times = [empty_task_experiment() for _ in range(TOTAL_EXPERIMENTS)]
-print("mean: " + str(mean(empty_tasks_times)) + "; std: " + str(stdev(empty_tasks_times)))
-print("Remote actor test:")
+    # empty tasks
+    empty_tasks_times = [empty_task_experiment() for _ in range(TOTAL_EXPERIMENTS)]
+    print("mean: " + str(mean(empty_tasks_times)) + "; std: " + str(stdev(empty_tasks_times)))
+    print("Remote actor test:")
 
-# empty actors
-empty_actors_times = [[0] * TOTAL_EXPERIMENTS] * len(NUMBER_OF_ACTORS)
-for i, actors in enumerate(NUMBER_OF_ACTORS):
-    empty_actors_times[i] = [empty_actor_experiment(fns, actors) for _ in range(TOTAL_EXPERIMENTS)]
-    print("mean: " + str(mean(empty_actors_times[i])) + "; std: " + str(stdev(empty_actors_times[i]))
-    + " (actors: " + str(actors) + "; batch size: " + str(TOTAL_EMPTY_TASKS // actors) + ")")
+    # empty actors
+    fns = [empty_fn for _ in range(TOTAL_EMPTY_TASKS)]
+    empty_actors_times = [[0] * TOTAL_EXPERIMENTS] * len(NUMBER_OF_ACTORS)
+    for i, actors in enumerate(NUMBER_OF_ACTORS):
+        empty_actors_times[i] = [empty_actor_experiment(fns, actors) for _ in range(TOTAL_EXPERIMENTS)]
+        print("mean: " + str(mean(empty_actors_times[i])) + "; std: " + str(stdev(empty_actors_times[i]))
+        + " (actors: " + str(actors) + "; batch size: " + str(TOTAL_EMPTY_TASKS // actors) + ")")
 
-print("Total number of experiments conducted for calculating mean/std: " + str(TOTAL_EXPERIMENTS))
+    print("Total number of experiments conducted for calculating mean/std: " + str(TOTAL_EXPERIMENTS))
