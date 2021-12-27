@@ -2,7 +2,7 @@ import ray
 import time
 import logging
 
-ray.init(num_cpus=32, log_to_driver=False, logging_level=logging.FATAL) # removing warnings
+ray.init(num_cpus=32) # removing warnings
 
 # empty task
 @ray.remote
@@ -27,7 +27,7 @@ print("Empty tasks (# tasks: " + str(n) + "): "+ str(end - start))
 
 # empty actors
 fns = [empty_fn for _ in range(n)]
-for a in [1, 2, 4, 8, 16, 32, 64, 128]:
+for a in [1, 2, 4, 8, 16, 32]:
 
     batch_size = n // a
 
