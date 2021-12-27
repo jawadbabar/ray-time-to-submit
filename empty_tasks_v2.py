@@ -1,8 +1,16 @@
 import ray
-import time
 import logging
 
-ray.init(num_cpus=64, log_to_driver=False, logging_level=logging.FATAL) # removing warnings
+from time import time
+from statistics import mean
+from statistics import stdev
+
+
+TOTAL_EXPERIMENTS = 128
+TOTAL_EMPTY_TASKS = 2**14
+NUMBER_OF_ACTORS = [1, 2, 4, 8, 16, 32]
+
+ray.init(num_cpus=32, log_to_driver=False, logging_level=logging.FATAL) # removing warnings
 
 # empty task
 @ray.remote
@@ -15,35 +23,45 @@ class EmptyActor:
     def work(self, fns):
         return [fn.remote() for fn in fns]
 
-# total number of empty tasks that take a little more than 1s
-n = 2**14
+# helper function to run an empty task experiment
+def empty_task_experiment():
+    start = time()
+    [empty_fn.remote() for _ in range(TOTAL_EMPTY_TASKS)]
+    end = time()
+    return end - start
+
+# helper function to run an empty actor experiment
+def empty_actor_experiment(fns, total_actors):
+    batch_size = TOTAL_EMPTY_TASKS // total_actors
+    actors = [EmptyActor.remote() for _ in range(total_actors)]
+
+    start = time()
+    refs = []
+    for i, actor in enumerate(actors):
+        batch = fns[i * batch_size : (i+1) * batch_size]
+        refs.append(actor.work.remote(batch))
+    ray.get(refs)
+    end = time()
+
+    return end - start
 
 # empty tasks
-start = time.time()
-[empty_fn.remote() for _ in range(n)]
-end = time.time()
-print("Empty tasks (# tasks: " + str(n) + "): "+ str(end - start))
-
+empty_tasks_times = [empty_task_experiment() for _ in range(TOTAL_EXPERIMENTS)]
 
 # empty actors
-fns = [empty_fn for _ in range(n)]
-for a in [1, 2, 4, 8, 16, 32, 64]:
+empty_actors_times = [[0] * TOTAL_EXPERIMENTS] * len(NUMBER_OF_ACTORS)
+for i, actors in enumerate(NUMBER_OF_ACTORS):
+    empty_actors_times[i] = [empty_actor_experiment(fns, actors) for _ in range(TOTAL_EXPERIMENTS)]
 
-    batch_size = n // a
+print("Total number of empty tasks: " + str(TOTAL_EMPTY_TASKS))
 
-    actors = []
-    for i in range(0, len(fns), batch_size):
-        batch = fns[i : i + batch_size]
-        actor = EmptyActor.remote()
-        actors.append(actor)
+print("Remote function test:")
+print("mean: " + str(mean(empty_tasks_times)) + "; std: " + str(stdev(empty_tasks_times)))
 
-    start = time.time()
-    refs = []
+print("Remote actor test:")
+for i, times in enumerate(empty_actors_times):
+    print("mean: " + str(mean(times)) + "; std: " + str(stdev(times))
+    + " (actors: " + str(NUMBER_OF_ACTORS[i]) + "; batch size: "
+    + str(TOTAL_EMPTY_TASKS // NUMBER_OF_ACTORS[i]) + ")")
 
-    for actor in actors:
-        refs.append(actor.work.remote(batch))
-
-    ray.get(refs)
-
-    end = time.time()
-    print("Actors with empty tasks (# tasks: " + str(n) + ", batch size: " + str(batch_size) + "): " + str(end - start))
+print("Total number of experiments conducted for calculating mean/std: " + str(TOTAL_EXPERIMENTS))
