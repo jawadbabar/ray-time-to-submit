@@ -6,7 +6,7 @@ from statistics import mean
 from statistics import stdev
 from math import log
 
-TOTAL_EXPERIMENTS = 128
+TOTAL_EXPERIMENTS = 100
 TOTAL_EMPTY_TASKS = 2**14
 NUMBER_OF_ACTORS = [1, 2, 4, 8, 16]
 
@@ -60,12 +60,11 @@ if __name__ == "__main__":
 
     # empty actors
     fns = [empty_fn for _ in range(TOTAL_EMPTY_TASKS)]
-    empty_actors_times = [[0] * TOTAL_EXPERIMENTS] * len(NUMBER_OF_ACTORS)
     for i, actors in enumerate(NUMBER_OF_ACTORS):
-        for j in range(7, log(TOTAL_EMPTY_TASKS // actors, 2) + 1):
-            batch = 2 ** 7
-            empty_actors_times[i] = [empty_actor_experiment(fns, actors, batch) for _ in range(TOTAL_EXPERIMENTS)]
-            print("mean: " + str(mean(empty_actors_times[i])) + "; std: " + str(stdev(empty_actors_times[i]))
+        for j in range(7, int(log(TOTAL_EMPTY_TASKS // actors, 2)) + 1):
+            batch = 2 ** j
+            empty_actors_times = [empty_actor_experiment(fns, actors, batch) for _ in range(TOTAL_EXPERIMENTS)]
+            print("mean: " + str(mean(empty_actors_times)) + "; std: " + str(stdev(empty_actors_times))
             + " (actors: " + str(actors) + "; batch size: " + str(batch) + ")")
 
     print("Total number of experiments conducted for calculating mean/std: " + str(TOTAL_EXPERIMENTS))
