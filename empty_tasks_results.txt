@@ -1,0 +1,11 @@
+Total number of empty tasks: 16384
+Remote function test:
+mean: 0.9546797312796116; std: 0.048599256772608214
+Remote actor test:
+mean: 1.3552793134003878; std: 0.05884494255855929 (actors: 1; batch size: 16384)
+mean: 0.8481164108961821; std: 0.17554339603255767 (actors: 2; batch size: 8192)
+mean: 0.6662804447114468; std: 0.26647842667558463 (actors: 4; batch size: 4096)
+mean: 0.8519363589584827; std: 0.44663229890425404 (actors: 8; batch size: 2048)
+mean: 1.2024563904851675; std: 0.39948982974057995 (actors: 16; batch size: 1024)
+mean: 1.2945518679916859; std: 0.545050265209834 (actors: 32; batch size: 512)
+Total number of experiments conducted for calculating mean/std: 128

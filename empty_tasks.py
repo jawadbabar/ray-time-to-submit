@@ -7,7 +7,7 @@ from statistics import stdev
 
 TOTAL_EXPERIMENTS = 128
 TOTAL_EMPTY_TASKS = 2**14
-NUMBER_OF_ACTORS = [1, 2, 4, 8, 16, 32]
+NUMBER_OF_ACTORS = [1, 2, 4, 8, 16]
 
 # empty task
 @ray.remote
@@ -28,15 +28,18 @@ def empty_task_experiment():
     return end - start
 
 # helper function to run an empty actor experiment
-def empty_actor_experiment(fns, total_actors):
-    batch_size = TOTAL_EMPTY_TASKS // total_actors
+def empty_actor_experiment(fns, total_actors, batch_size):
+    tasks_per_actor = TOTAL_EMPTY_TASKS // total_actors
+    batches_per_actor = tasks_per_actor // batch_size
     actors = [EmptyActor.remote() for _ in range(total_actors)]
 
     start = time()
     refs = []
     for i, actor in enumerate(actors):
-        batch = fns[i * batch_size : (i+1) * batch_size]
-        refs.append(actor.work.remote(batch))
+        batch_per_actor = fns[i * tasks_per_actor : (i+1) * tasks_per_actor]
+        for j in range(batches_per_actor):
+            batch = fns[j * batch_size : (j+1) * batch_size]
+            refs.append(actor.work.remote(batch))
     ray.get(refs)
     end = time()
 
@@ -58,7 +61,7 @@ if __name__ == "__main__":
     fns = [empty_fn for _ in range(TOTAL_EMPTY_TASKS)]
     empty_actors_times = [[0] * TOTAL_EXPERIMENTS] * len(NUMBER_OF_ACTORS)
     for i, actors in enumerate(NUMBER_OF_ACTORS):
-        empty_actors_times[i] = [empty_actor_experiment(fns, actors) for _ in range(TOTAL_EXPERIMENTS)]
+        empty_actors_times[i] = [empty_actor_experiment(fns, actors, TOTAL_EMPTY_TASKS // actors) for _ in range(TOTAL_EXPERIMENTS)]
         print("mean: " + str(mean(empty_actors_times[i])) + "; std: " + str(stdev(empty_actors_times[i]))
         + " (actors: " + str(actors) + "; batch size: " + str(TOTAL_EMPTY_TASKS // actors) + ")")
 
