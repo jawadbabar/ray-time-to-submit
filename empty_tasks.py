@@ -39,7 +39,7 @@ def empty_actor_experiment(fns, total_actors, batch_size):
     for i, actor in enumerate(actors):
         batch_per_actor = fns[i * tasks_per_actor : (i+1) * tasks_per_actor]
         for j in range(batches_per_actor):
-            batch = fns[j * batch_size : (j+1) * batch_size]
+            batch = batch_per_actor[j * batch_size : (j+1) * batch_size]
             refs.append(actor.work.remote(batch))
     ray.get(refs)
     end = time()
