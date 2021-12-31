@@ -48,7 +48,7 @@ def empty_actor_experiment(fns, total_actors, batch_size):
 
 if __name__ == "__main__":
 
-    ray.init(num_cpus=32, log_to_driver=False, logging_level=logging.FATAL) # removing warnings
+    ray.init(num_cpus=32) # removing warnings
 
     print("Total number of empty tasks: " + str(TOTAL_EMPTY_TASKS))
     print("Remote function test:")
