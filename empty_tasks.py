@@ -74,8 +74,12 @@ def prog(init_cpu, decorator_cpu):
 
 if __name__ == "__main__":
 
-    for j in [32, 64]:
-        for i in range(3):
-            print("init cpu: " + str(j))
-            print("decorator cpu: " + str(i))
-            prog(j, i)
+    print("init cpu: " + str(32))
+    print("decorator cpu: " + str(2))
+    prog(32, 2)
+
+
+    for i in range(3):
+        print("init cpu: " + str(64))
+        print("decorator cpu: " + str(i))
+        prog(64, i)
